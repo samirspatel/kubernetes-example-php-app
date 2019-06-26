@@ -13,12 +13,12 @@
              alt="" height="72">
 
         <h2 class="bg-primary" style="color:white;">
-            Your lucky number is {{ number }}
+            Your lucky number is {{ luckyNumber }}
         </h2>
 
-        {% if envVars.HOSTNAME is defined %}
+        {% if kubernetesPod is not empty %}
             <h2 class="bg-info" style="color:white;">
-            Kubernetes Pod: {{ envVars.HOSTNAME }}
+            Kubernetes Pod: {{ kubernetesPod }}
             </h2>
         {% endif %}
 

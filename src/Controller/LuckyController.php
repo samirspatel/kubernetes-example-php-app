@@ -19,10 +19,16 @@ class LuckyController extends AbstractController
      */
     public function number(NumberGenerator $generator)
     {
-        return $this->render('lucky/number.html.twig', [
-            'number' => $generator->random(),
-            'envVars' => $_ENV,
-            'environment' => $this->getParameter('kernel.environment')
-        ]);
+        $luckyNumber   = $generator->random();
+        $kubernetesPod = $_ENV['HOSTNAME'] ?? null;
+        $environment   = $this->getParameter('kernel.environment');
+
+        $data = [
+            "luckyNumber"   => $luckyNumber,
+            "kubernetesPod" => $kubernetesPod,
+            "environment"   => $environment,
+        ];
+
+        return $this->render('lucky/number.html.twig', $data);
     }
 }
