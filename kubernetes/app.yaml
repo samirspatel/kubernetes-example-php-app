@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube-php
+spec:
+  selector:
+    matchLabels:
+      app: kube-php
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kube-php
+    spec:
+      containers:
+        - name: kube-php
+          image: docker.io/sameg14/kubernetes-example-php-app:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+---
+# This is a way to expose your app to the world with a public IP
+apiVersion: v1
+kind: Service
+metadata:
+  name: kube-php-service
+spec:
+  selector:
+    app: kube-php
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000

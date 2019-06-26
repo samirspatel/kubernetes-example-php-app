@@ -1,0 +1,27 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+
+    <div class="py-5 text-center">
+
+        <img class="d-block mx-auto mb-4" src="{{ asset('images/kubernetes.png') }}"
+             alt="" height="72">
+
+        <h1>+</h1>
+
+        <img class="d-block mx-auto mb-4" src="{{ asset('images/symfony.svg') }}"
+             alt="" height="72">
+
+        <h2 class="bg-primary" style="color:white;">
+            Your lucky number is {{ number }}
+        </h2>
+
+        {% if envVars.HOSTNAME is defined %}
+            <h2 class="bg-info" style="color:white;">
+            Kubernetes Pod: {{ envVars.HOSTNAME }}
+            </h2>
+        {% endif %}
+
+    </div>
+
+{% endblock %}
