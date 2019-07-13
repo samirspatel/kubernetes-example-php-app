@@ -57,7 +57,7 @@ class ServeCommand extends Command
 
         try {
             $server = new WebServer($this->pidFileDir);
-            $config = new WebServerConfig($this->docRoot, $this->environment, $this->port);
+            $config = new WebServerConfig($this->docRoot, $this->environment, '0.0.0.0:' . $this->port);
 
             $message = sprintf('Server listening on http://%s', $config->getAddress());
             if ('' !== $displayAddress = $config->getDisplayAddress()) {
