@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kube-php
+  namespace: prod
 spec:
   selector:
     matchLabels:
@@ -26,16 +27,71 @@ spec:
               memory: "1Gi"
               cpu: "500m"
 ---
-# This is a way to expose your app to the world with a public IP
-apiVersion: v1
 kind: Service
+apiVersion: v1
 metadata:
-  name: kube-php-service
+  name: kube-php
+  namespace: prod
 spec:
   selector:
     app: kube-php
-  type: LoadBalancer
   ports:
     - protocol: TCP
-      port: 80
+      port: 3000
       targetPort: 8000
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: kube-php
+  namespace: prod
+spec:
+  hosts:
+    - "kube-php.flokubernetes.com"
+  gateways:
+    - default-gateway.istio-system.svc.cluster.local
+  http:
+    - route:
+        - destination:
+            host: kube-php
+            port:
+              number: 3000
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: kube-php-env
+  namespace: prod
+spec:
+  hosts:
+    - "kube-php.prod.flokubernetes.com"
+  gateways:
+    - default-gateway.istio-system.svc.cluster.local
+  http:
+    - route:
+        - destination:
+            host: kube-php
+            port:
+              number: 3000
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: kube-php-leg
+  namespace: prod
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - default-gateway.istio-system.svc.cluster.local
+  http:
+    - match:
+        - uri:
+            prefix: "/kube-php/"
+      rewrite:
+        uri: "/"
+      route:
+        - destination:
+            host: kube-php
+            port:
+              number: 3000
