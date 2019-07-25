@@ -27,6 +27,12 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
+    # explicitly configure the service
+    App\Command\ServeCommand:
+        arguments:
+            $docRoot: '%kernel.project_dir%/public'
+            $environment: '%kernel.environment%'
+            $pidFileDir: '%kernel.project_dir%/var/cache'
 framework:
     profiler:
         collect: false

@@ -21,6 +21,4 @@ RUN COMPOSER_ALLOW_SUPERUSER=1 composer install
 
 RUN ./bin/phpunit
 
-EXPOSE 8000
-
-ENTRYPOINT ["php", "bin/console" ,"server:run" ,"0.0.0.0:8000"]
+ENTRYPOINT ["php", "bin/console" ,"app:serve"]

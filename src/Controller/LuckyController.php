@@ -22,11 +22,13 @@ class LuckyController extends AbstractController
         $luckyNumber   = $generator->random();
         $kubernetesPod = $_ENV['HOSTNAME'] ?? null;
         $environment   = $this->getParameter('kernel.environment');
+        $docRoot = $this->getParameter('kernel.project_dir');
 
         $data = [
             "luckyNumber"   => $luckyNumber,
             "kubernetesPod" => $kubernetesPod,
             "environment"   => $environment,
+            'docRoot' => $docRoot
         ];
 
         return $this->render('lucky/number.html.twig', $data);
