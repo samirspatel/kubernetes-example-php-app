@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kube-php
-  namespace: stag
+  namespace: prod
 spec:
   selector:
     matchLabels:
@@ -31,7 +31,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: kube-php
-  namespace: stag
+  namespace: prod
 spec:
   selector:
     app: kube-php
@@ -44,53 +44,15 @@ apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
   name: kube-php
-  namespace: stag
+  namespace: prod
 spec:
   hosts:
     - "kube-php.flokubernetes.com"
+    - "kube-php.prod.flokubernetes.com"
   gateways:
     - default-gateway.istio-system.svc.cluster.local
   http:
     - route:
-        - destination:
-            host: kube-php
-            port:
-              number: 3000
----
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: kube-php-env
-  namespace: stag
-spec:
-  hosts:
-    - "kube-php.stag.flokubernetes.com"
-  gateways:
-    - default-gateway.istio-system.svc.cluster.local
-  http:
-    - route:
-        - destination:
-            host: kube-php
-            port:
-              number: 3000
----
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: kube-php-leg
-  namespace: stag
-spec:
-  hosts:
-    - "*"
-  gateways:
-    - default-gateway.istio-system.svc.cluster.local
-  http:
-    - match:
-        - uri:
-            prefix: "/kube-php/"
-      rewrite:
-        uri: "/"
-      route:
         - destination:
             host: kube-php
             port:
