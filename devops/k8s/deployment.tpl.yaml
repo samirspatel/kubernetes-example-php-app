@@ -41,7 +41,7 @@ spec:
             - name: APP_NAME
               value: _APP_NAME
             - name: PORT
-              value:"" _APP_PORT
+              value: "_APP_PORT"
           ports:
             - containerPort: _APP_PORT
           livenessProbe:
