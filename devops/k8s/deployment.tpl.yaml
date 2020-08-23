@@ -1,0 +1,142 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: _APP_ENV
+  name: _APP_NAME
+  labels:
+    app: _APP_NAME
+    env: _APP_ENV
+    ver: "_APP_VERSION"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: _APP_NAME
+      env: _APP_ENV
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      namespace: _APP_ENV
+      labels:
+        app: _APP_NAME
+        env: _APP_ENV
+        ver: "_APP_VERSION"
+    spec:
+      imagePullSecrets:
+        - name: gcr-json-key
+      containers:
+        - name: _APP_NAME
+          image: gcr.io/_PROJECT_ID/_APP_NAME:_APP_VERSION
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: APP_ENV
+              value: _APP_ENV
+            - name: APP_VERSION
+              value: "_APP_VERSION"
+            - name: APP_NAME
+              value: _APP_NAME
+            - name: PORT
+              value: _APP_PORT
+          ports:
+            - containerPort: _APP_PORT
+          livenessProbe:
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            httpGet:
+              path: /
+              port: _APP_PORT
+          readinessProbe:
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            httpGet:
+              path: /
+              port: _APP_PORT
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64M
+            limits:
+              cpu: 1000m
+              memory: 256M
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: _APP_NAME
+  namespace: _APP_ENV
+  labels:
+    app: _APP_NAME
+    env: _APP_ENV
+    ver: "_APP_VERSION"
+spec:
+  selector:
+    app: _APP_NAME
+    env: _APP_ENV
+  ports:
+    - protocol: TCP
+      port: _APP_PORT
+      targetPort: _APP_PORT
+      name: http
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: _APP_NAME
+  namespace: _APP_ENV
+spec:
+  hosts:
+    - "_APP_NAME.flokubernetes.com"
+    - "_APP_NAME._APP_ENV.flokubernetes.com"
+  gateways:
+    - istio-system/default-gateway
+  http:
+    - route:
+        - destination:
+            host: _APP_NAME
+            port:
+              number: _APP_PORT
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: _APP_NAME
+  namespace: _APP_ENV
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: _APP_NAME
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: _APP_NAME
+  namespace: _APP_ENV
+spec:
+  minReplicas: 2
+  maxReplicas: 5
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: _APP_NAME
+  targetCPUUtilizationPercentage: 50
+---
+apiVersion: autoscaling.k8s.io/v1beta2
+kind: VerticalPodAutoscaler
+metadata:
+  name: _APP_NAME
+  namespace: _APP_ENV
+spec:
+  targetRef:
+    apiVersion: 'apps/v1'
+    kind: Deployment
+    name: _APP_NAME
+    namespace: _APP_ENV
+  updatePolicy:
+    updateMode: 'Off'
+
