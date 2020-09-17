@@ -1,0 +1,59 @@
+steps:
+  # _APP_ENV, _APP_NAME, _CLUSTER, _REGION need to be defined in the build trigger
+  - name: 'gcr.io/cloud-builders/docker'
+    id: Build
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/$_APP_NAME:$SHORT_SHA'
+      - '.'
+    timeout: 600s
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: Push
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/$_APP_NAME:$SHORT_SHA'
+
+  - name: gcr.io/cloud-builders/docker
+    id: Tag
+    args:
+      - 'tag'
+      - 'gcr.io/$PROJECT_ID/$_APP_NAME:$SHORT_SHA'
+      - 'gcr.io/$PROJECT_ID/$_APP_NAME:$_APP_ENV'
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: Generate Manifests
+    entrypoint: /bin/sh
+    args:
+      - '-c'
+      - |
+        # Replace env vars in template
+        # Replacement vars from cloudbuild trigger are prefixed with an _
+        # This is also the case in the template
+        sed "s/_APP_ENV/${_APP_ENV}/g" ./devops/k8s/deployment.tpl.yaml | \
+        sed "s/_APP_NAME/${_APP_NAME}/g" | \
+        sed "s/_APP_PORT/${_APP_PORT}/g" | \
+        sed "s/_PROJECT_ID/${PROJECT_ID}/g" | \
+        sed "s/_APP_VERSION/${SHORT_SHA}/g" > /workspace/deployment.yaml
+
+        # Remove template so it does not get applied
+        rm ./devops/k8s/deployment.tpl.yaml
+
+  - name: 'gcr.io/cloud-builders/kubectl'
+    id: Update Manifests
+    args:
+      - apply
+      - -f
+      - /workspace/deployment.yaml
+    env:
+     - 'CLOUDSDK_COMPUTE_REGION=$_REGION'
+     - 'CLOUDSDK_CONTAINER_CLUSTER=$_CLUSTER'
+     - 'GCLOUD_PROJECT=$PROJECT_ID'
+
+images:
+  - 'gcr.io/$PROJECT_ID/$_APP_NAME:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/$_APP_NAME:$_APP_ENV'
+
+tags: [$_APP_NAME, $_APP_ENV]
+
