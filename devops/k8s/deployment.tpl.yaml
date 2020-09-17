@@ -7,6 +7,9 @@ metadata:
     app: _APP_NAME
     env: _APP_ENV
     ver: "_APP_VERSION"
+    tags.datadoghq.com/env: "_APP_ENV"
+    tags.datadoghq.com/service: "_APP_NAME"
+    tags.datadoghq.com/version: "_APP_VERSION"
 spec:
   replicas: 1
   selector:
@@ -26,6 +29,9 @@ spec:
         app: _APP_NAME
         env: _APP_ENV
         ver: "_APP_VERSION"
+        tags.datadoghq.com/env: "_APP_ENV"
+        tags.datadoghq.com/service: "_APP_NAME"
+        tags.datadoghq.com/version: "_APP_VERSION"
     spec:
       imagePullSecrets:
         - name: gcr-json-key
@@ -42,6 +48,18 @@ spec:
               value: _APP_NAME
             - name: PORT
               value: "_APP_PORT"
+            - name: DD_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/env']
+            - name: DD_SERVICE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/service']
+            - name: DD_VERSION
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/version']
           ports:
             - containerPort: _APP_PORT
           livenessProbe:
