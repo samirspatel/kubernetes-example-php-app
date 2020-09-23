@@ -7,6 +7,9 @@ metadata:
     app: _APP_NAME
     env: _APP_ENV
     ver: "_APP_VERSION"
+    tags.datadoghq.com/env: "_APP_ENV"
+    tags.datadoghq.com/service: "_APP_NAME"
+    tags.datadoghq.com/version: "_APP_VERSION"
 spec:
   replicas: 1
   selector:
@@ -26,6 +29,9 @@ spec:
         app: _APP_NAME
         env: _APP_ENV
         ver: "_APP_VERSION"
+        tags.datadoghq.com/env: "_APP_ENV"
+        tags.datadoghq.com/service: "_APP_NAME"
+        tags.datadoghq.com/version: "_APP_VERSION"
     spec:
       imagePullSecrets:
         - name: gcr-json-key
@@ -40,25 +46,45 @@ spec:
               value: "_APP_VERSION"
             - name: APP_NAME
               value: _APP_NAME
-            - name: PORT
-              value: "_APP_PORT"
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_LOGS_INJECTION
+              value: "true"
+            - name: DD_TRACE_REPORT_HOSTNAME
+              value: "true"
+            - name: DD_TRACE_ANALYTICS_ENABLED
+              value: "true"
+            - name: DD_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/env']
+            - name: DD_SERVICE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/service']
+            - name: DD_VERSION
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/version']
           ports:
             - containerPort: _APP_PORT
           livenessProbe:
             initialDelaySeconds: 2
             periodSeconds: 5
             httpGet:
-              path: /
+              path: /livez
               port: _APP_PORT
           readinessProbe:
             initialDelaySeconds: 2
             periodSeconds: 5
             httpGet:
-              path: /
+              path: /healthz
               port: _APP_PORT
           resources:
             requests:
-              cpu: 10m
+              cpu: 100m
               memory: 64M
             limits:
               cpu: 1000m
@@ -83,7 +109,7 @@ spec:
       targetPort: _APP_PORT
       name: http
 ---
-apiVersion: networking.istio.io/v1beta1
+apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
   name: _APP_NAME
@@ -93,7 +119,7 @@ spec:
     - "_APP_NAME.flokubernetes.com"
     - "_APP_NAME._APP_ENV.flokubernetes.com"
   gateways:
-    - istio-system/default-gateway
+    - default-gateway.istio-system.svc.cluster.local
   http:
     - route:
         - destination:
@@ -139,4 +165,3 @@ spec:
     namespace: _APP_ENV
   updatePolicy:
     updateMode: 'Off'
-
