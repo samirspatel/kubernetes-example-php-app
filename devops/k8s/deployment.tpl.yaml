@@ -109,7 +109,7 @@ spec:
       targetPort: _APP_PORT
       name: http
 ---
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: _APP_NAME
@@ -119,7 +119,7 @@ spec:
     - "_APP_NAME.flokubernetes.com"
     - "_APP_NAME._APP_ENV.flokubernetes.com"
   gateways:
-    - default-gateway.istio-system.svc.cluster.local
+    - istio-system/default-gateway
   http:
     - route:
         - destination:
