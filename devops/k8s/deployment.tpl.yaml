@@ -70,18 +70,18 @@ spec:
                   fieldPath: metadata.labels['tags.datadoghq.com/version']
           ports:
             - containerPort: _APP_PORT
-          livenessProbe:
-            initialDelaySeconds: 2
-            periodSeconds: 5
-            httpGet:
-              path: /livez
-              port: _APP_PORT
-          readinessProbe:
-            initialDelaySeconds: 2
-            periodSeconds: 5
-            httpGet:
-              path: /healthz
-              port: _APP_PORT
+          # livenessProbe:
+          #   initialDelaySeconds: 2
+          #   periodSeconds: 5
+          #   httpGet:
+          #     path: /livez
+          #     port: _APP_PORT
+          # readinessProbe:
+          #   initialDelaySeconds: 2
+          #   periodSeconds: 5
+          #   httpGet:
+          #     path: /healthz
+          #     port: _APP_PORT
           resources:
             requests:
               cpu: 100m
