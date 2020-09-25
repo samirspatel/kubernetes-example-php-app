@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,8 +14,9 @@ class LoadTestController extends AbstractController
     /**
      * @Route("/lt", name="load_test")
      */
-    public function index()
+    public function index(LoggerInterface $logger)
     {
+        $logger->info('Something happened');
         return new JsonResponse(['foo' => 'manchu']);
         // return new Response('
         // <style>
