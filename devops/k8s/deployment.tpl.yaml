@@ -66,13 +66,13 @@ spec:
             initialDelaySeconds: 2
             periodSeconds: 5
             httpGet:
-              path: /livez
+              path: /
               port: _APP_PORT
           readinessProbe:
             initialDelaySeconds: 2
             periodSeconds: 5
             httpGet:
-              path: /healthz
+              path: /
               port: _APP_PORT
           resources:
             requests:
