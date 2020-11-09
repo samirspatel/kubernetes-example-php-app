@@ -15,8 +15,16 @@ class HealthController extends AbstractController
     /**
      * @Route("/healthz", name="health")
      */
-    public function index()
+    public function healthz()
     {
         return new Response('ping');
+    }
+
+    /**
+     * @Route("/livez", name="health")
+     */
+    public function livez()
+    {
+        return new Response('pong');
     }
 }
