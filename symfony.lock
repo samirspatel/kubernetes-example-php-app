@@ -29,6 +29,9 @@
     "nikic/php-parser": {
         "version": "v4.2.2"
     },
+    "php": {
+        "version": "7.3"
+    },
     "phpdocumentor/reflection-common": {
         "version": "1.0.1"
     },
@@ -246,9 +249,6 @@
     },
     "symfony/polyfill-php73": {
         "version": "v1.11.0"
-    },
-    "symfony/polyfill-php80": {
-        "version": "v1.18.1"
     },
     "symfony/process": {
         "version": "v4.3.1"
