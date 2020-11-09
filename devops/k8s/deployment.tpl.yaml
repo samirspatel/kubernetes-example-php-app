@@ -46,16 +46,8 @@ spec:
               value: "_APP_VERSION"
             - name: APP_NAME
               value: _APP_NAME
-            - name: DD_AGENT_HOST
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.hostIP
-            - name: DD_LOGS_INJECTION
-              value: "true"
-            - name: DD_TRACE_REPORT_HOSTNAME
-              value: "true"
-            - name: DD_TRACE_ANALYTICS_ENABLED
-              value: "true"
+            - name: PORT
+              value: "_APP_PORT"
             - name: DD_ENV
               valueFrom:
                 fieldRef:
